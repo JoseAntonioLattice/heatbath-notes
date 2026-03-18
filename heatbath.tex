@@ -1,0 +1,66 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\author{José Antonio García Hernández}
+\title{The Heatbath algorithm}
+\newcommand*{\eps}{0.05}
+\newcommand*{\Real}{\text{Re}\,}
+\usepackage{tikz}
+
+\begin{document}
+\maketitle
+In Yang Mills theories, Heatbath algorithms generate updates for a variable $U_{\mu}(x)$ with probability density
+\begin{equation}    
+    dP(U) \propto \exp(-S[U])dU,
+\end{equation}
+where $S[U]$ is the action of the configuration $[U]$.
+
+Let's define the sum of staples
+\begin{equation}
+    \Sigma_{\mu}(x) = \sum_{\nu\ne\mu} [U_{\nu}(x)U_{\mu}(a+\hat\nu)U^{\dagger}_{\nu}(x+a\hat\mu) + U^{\dagger}_{\nu}(x-a\hat\nu)U_{\mu}(x-a\hat\nu)U_{\nu}(x-a\hat\nu+a\hat\mu)],
+\end{equation}
+which is the sum of $2(d-1)$ \textit{staples} where $d$ is the number of dimensions. Then the local action of a single variable in a site $x$ in direction $\mu$ can be written in terms of the staples (which do not depend on $U_{\mu}(x)$) and the variable $U_{\mu}(x)$
+\begin{equation}
+    S(U_{\mu}(x)) = -\frac{\beta}{N} \text{Re}\, \text{Tr} (U_{\mu}(x)\Sigma^{\dagger}_{\mu}(x)).
+\end{equation}
+
+If the theory is Abelian
+\begin{equation}
+    S(U_{\mu}(x)) = -\beta \text{Re}\, (U_{\mu}(x)\Sigma^*_{\mu}(x)).
+\end{equation}
+
+
+The main idea is to separate the action into two parts, one that does not depend on the variable and other which depend on the sourrounding variables. It can be easily generalize to other theories, such as the Ising model, O($N$) models, etc.
+ For instance, for $O(N)$ models
+\begin{equation}
+    S(\sigma_x) = \sigma_x\cdot\Sigma(x),
+\end{equation} 
+ where
+\begin{equation}
+    \Sigma(x) = \sum_{y\in\text{neighbors}} \sigma_y . 
+\end{equation}
+ 
+For the Abelian and Yang Mills gauges theories, we create an update $U'_{\mu}(x)$ that follows the probability density function defined above. Since it only depends on the neighboring links, they provide a local ``heatbath'' to the variable. For the Abelian case, $U_{\mu}(x) = \exp(i\varphi(x))$, the sum of staples is a complex number that can be represented in its pxolar form
+\begin{equation}
+    \Sigma_{\mu}(x) = v \exp(i\gamma).
+\end{equation} 
+ In these variables the density function takes the form
+ \begin{equation}
+     p = \exp\{\beta\Real(v\exp(i(\varphi_{\mu}(x)+\gamma))\} = \exp(\beta v \cos(\varphi_{\mu}(x)+\gamma)).
+ \end{equation}
+This density is not normalized but it is not necessary. 
+ 
+ 
+\begin{figure}
+\centering
+\begin{tikzpicture}[scale=2]    
+    \draw[thick] (0,\eps)--(0,1)--(1,1)--(1,\eps);
+    \draw[dotted] (0,0) -- (1,0);
+    \draw[thick] (0,-\eps)--(0,-1)--(1,-1)--(1,-\eps);
+\end{tikzpicture}
+\caption{Staples}
+\end{figure}
+\end{document}
