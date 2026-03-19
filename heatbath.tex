@@ -7,63 +7,67 @@
 \author{José Antonio García Hernández}
 \title{The Heatbath algorithm}
 \newcommand*{\eps}{0.05}
-\newcommand*{\Real}{\text{Re}\,}
+\newcommand*{\Real}{\,\text{Re}}
 \usepackage{tikz}
 \usepackage{pgfplots}
 \pgfplotsset{compat=newest}
-
+%package for the 1 matrix
+\usepackage{dsfont}
 \begin{document}
 \maketitle
-In Yang Mills theories, Heatbath algorithms generate updates for a variable $U_{\mu}(x)$ with probability density
+\section{Introduction}
+In Yang Mills theories, Heatbath algorithms \cite{creutz1980} generate updates for a variable $U_{\mu}(x)$ with probability density
 \begin{equation}    
-    dP(U) \propto \exp(-S[U])dU,
+    dP(U) \propto \exp(-S(U))dU,
 \end{equation}
-where $S[U]$ is the action of the configuration $[U]$.
+where $S(U)$ is the local action. For references see \cite{gattringer, knechtli}.
 
 Let's define the sum of staples
 \begin{equation}
-    \Sigma_{\mu}(x) = \sum_{\nu\ne\mu} [U_{\nu}(x)U_{\mu}(a+\hat\nu)U^{\dagger}_{\nu}(x+a\hat\mu) + U^{\dagger}_{\nu}(x-a\hat\nu)U_{\mu}(x-a\hat\nu)U_{\nu}(x-a\hat\nu+a\hat\mu)],
+\label{eq:staples}
+    \Sigma_{x,\mu} = \sum_{\nu\ne\mu} \left( \underbrace{U_{x,\nu}U_{x+\hat\nu,\mu}U^{\dagger}_{x+\hat\mu,\nu}}_{\sqcup} + \underbrace{U^{\dagger}_{x-\hat\nu,\nu}U_{x-\hat\nu,\mu}U_{x-\hat\nu+\hat\mu,\nu}}_{\sqcap}\right),
 \end{equation}
-which is the sum of $2(d-1)$ \textit{staples} where $d$ is the number of dimensions. Then the local action of a single variable in a site $x$ in direction $\mu$ can be written in terms of the staples (which do not depend on $U_{\mu}(x)$) and the variable $U_{\mu}(x)$
+which is the sum of $2(d-1)$ \textit{staples} where $d$ is the number of dimensions. Then the local action of a single variable in a site $x$ in direction $\mu$ can be written in terms of the staples (which does not depend on $U_{x,\mu}$) and the variable $U_{x,\mu}$
 \begin{equation}
-    S(U_{\mu}(x)) = -\frac{\beta}{N} \text{Re}\, \text{Tr} (U_{\mu}(x)\Sigma^{\dagger}_{\mu}(x)).
+    S(U_{x,\mu}) = -\frac{\beta}{N} \Real\, \text{Tr} (U_{x,\mu}\Sigma^{\dagger}_{x,\mu}).
 \end{equation}
 
 If the theory is Abelian
 \begin{equation}
-    S(U_{\mu}(x)) = -\beta \text{Re}\, (U_{\mu}(x)\Sigma^*_{\mu}(x)).
+    S(U_{x,\mu}) = -\beta \Real \, (U_{x,\mu}\Sigma^*_{x,\mu}).
 \end{equation}
 
 
 The main idea is to separate the action into two parts, one that does not depend on the variable and other which depend on the sourrounding variables. It can be easily generalize to other theories, such as the Ising model, O($N$) models, etc.
  For instance, for $O(N)$ models
 \begin{equation}
-    S(\sigma_x) = \sigma_x\cdot\Sigma(x),
+    S(\sigma_x) = \sigma_x\cdot\Sigma_x,
 \end{equation} 
  where
 \begin{equation}
-    \Sigma(x) = \sum_{y\in\text{neighbors}} \sigma_y . 
+    \Sigma_x = \sum_{y\in\text{neighbors}} \sigma_y . 
 \end{equation}
  
-For the Abelian and Yang Mills gauges theories, we create an update $U'_{\mu}(x)$ that follows the probability density function defined above. Since it only depends on the neighboring links, they provide a local ``heatbath'' to the variable. For the Abelian case, we can generate an update of the field $U'_{\mu}(x) = \exp(i\varphi'(x))$, the sum of staples is a complex number that can be represented in its polar form
+For the Abelian and Yang Mills gauges theories, we create an update $U'_{x,\mu}$ that follows the probability density function defined above. Since it only depends on the neighboring links, they provide a local ``heatbath'' to the variable. For the Abelian case, we can generate an update of the field $U'_{x,\mu} = \exp(i\varphi'_{x,\mu})$, the sum of staples is a complex number that can be represented in its polar form
 \begin{equation}
-    \Sigma_{\mu}(x) = v \exp(i\gamma).
+    \Sigma_{x,\mu} = v \exp(i\gamma).
 \end{equation} 
  In these variables the density function takes the form
  \begin{equation}
-     p = \exp\{\beta\Real(v\exp(i(\varphi'_{\mu}(x)+\gamma))\} = \exp(\beta v \cos(\varphi'_{\mu}(x)+\gamma)).
+     p = \exp\{\beta\Real(v\exp(i(\varphi'_{x,\mu}-\gamma))\} = \exp(\beta v \cos(\varphi'_{x,\mu}-\gamma)).
  \end{equation}
-This density is not normalized but it is not necessary. We can sample the random angle $\varphi'_{\mu}(x)$ from the distribution by the accept/reject method.
+This density is not normalized but it is not necessary. We can sample the random angle $\varphi'_{x,\mu}$ from the distribution by the accept/reject method.
 
 \section{Accept-reject method}
 
-Suppose a distribution $\rho(x)$ not necessarly normalized. Then the simplest thing to do is to draw a pair of uniform random numbers $(x^*,y^*)$ where $x^*$ is in the range of the distribution and $y^*\in [0,y_{\text{max}}]$. If $y^*\le \rho(x^*)$ then we accept the pair, if not we reject it. Then, $x^*$ follows the distribution.
- 
-For the case of our Abelian gauge theory
+Suppose a distribution $\rho(x)$ not necessarly normalized. Then the simplest thing to do is to draw a pair of uniform random numbers $(x',y')$ where $x'$ is in the domain of the distribution and $y'\in [0,\rho_{\text{max}}]$. If $y'\le \rho(x')$ then we accept $x'$, if not we reject it. Then, $x'$ follows the distribution $\rho(x)$.
+
+\section{Heatbath algorithm for U(1)}
+For the case of our Abelian gauge theory \cite{Gerber}:
 \begin{enumerate}
-	\item Draw a uniform number $u_1\in[0,1)$ and define $\varphi'_{\mu}(x) = 2\pi u_1$.
-	\item Draw another uniform number $u_2\in[0,1)$ and define $Z = y_{\max}u_2$, where $y_{\max} = \exp(v\beta)$.
-	\item If $Z\le \exp(\beta v \cos(\varphi'_{\mu}(x)+\gamma)) $ accept $\varphi'_{\mu}(x)$ as the new variable. If not, return to step 1 until a value $\varphi'_{\mu}(x)$ is accepted.
+	\item Draw a uniform random number $u_1\in[0,1)$ and define $\varphi'_{x,\mu} = 2\pi u_1$.
+	\item Draw another uniform random number $u_2\in[0,1)$ and define $y' = \rho_{\max}u_2$, where $\rho_{\max} = \exp(v\beta)$.
+	\item If $y'\le \exp(\beta v \cos(\varphi'_{x,\mu}-\gamma)) $ accept $\varphi'_{x,\mu}$ as the new variable. If not, return to step 1 until a value $\varphi'_{x,\mu}$ is accepted.
 \end{enumerate} 
  
  
@@ -71,10 +75,13 @@ For the case of our Abelian gauge theory
 \centering
 \begin{tikzpicture}[scale=2]    
     \draw[thick] (0,\eps)--(0,1)--(1,1)--(1,\eps);
-    \draw[dotted] (0,0) -- (1,0);
+    \draw[blue, thick,-latex] (0,0) -- (1,0);
+    \draw (0.5,0) node[above] {$U_{x,\mu}$};
     \draw[thick] (0,-\eps)--(0,-1)--(1,-1)--(1,-\eps);
+    \draw[-latex] (2.5,0)--(3,0) node[above]{$\hat\mu$};
+    \draw[-latex] (2.5,0)--(2.5,0.5) node[right]{$\hat\nu$};
 \end{tikzpicture}
-\caption{Staples}
+\caption{There are two staples $\sqcup$ and $\sqcap$, of a link $U_{x,\mu}$ in each plane. Symbollically the sum of staples is written as $\Sigma_{x,\mu} = \sum_{\text{planes}} (\sqcup + \sqcap)$. In two dimensions there is only one plane.}
 \end{figure}
 
 
@@ -82,32 +89,156 @@ For the case of our Abelian gauge theory
 \centering
 \begin{tikzpicture}
 \begin{axis}[
-    xlabel=$x$, ylabel=$y$,
+    xlabel=$x$, ylabel=$\rho(x)$,
     xmin=0, xmax=2*pi,
     ymin=0, ymax=10
 ]
 \addplot[blue, domain=0:2*pi, samples=1000] {exp(2*cos(deg(x-1))};
-\addplot[red, domain = 0:2*pi, dashed] {exp(2)};
+\addplot[orange, domain = 0:2*pi, dashed] {exp(2)};
 \end{axis}
 \fill[green] (1,2) circle (0.1);
 \fill[red] (3,3) circle (0.1);
+\node[orange] at (1,4.5) {$\rho_{\text{max}}$};
 \end{tikzpicture}   
-\caption{Accept-reject method. We accept the pair represented by the green dot, and reject the red one.}
+\caption{Accept-reject method. We accept the $x'$ represented by the green dot, and reject the red one.}
 \end{figure}
 
-\section{Comparison of the Glauber and Heatbath algorithms for the Ising Model}
+\newpage
+\section*{Comparison of the Glauber and Heatbath algorithms for the Ising Model}
 
-For the Ising model, the probability distribution of the Heatbath algorithm becomes
+For the Ising model, the probability distribution of the Heatbath algorithm of a porposal spin $s'_x$ becomes
 \begin{equation}
-	p \propto \exp(-\beta s_x\Sigma_x),
+	p \propto \exp(-\beta s'_x\Sigma_x),
 \end{equation}
-where $\Sigma_x$ is the sum of the nearest neighbors of the spin in site $x$. This is a discrete distibution in $s_x$ since there are only two posibilities for the spin: the proposal spin can be parallel to the original spin or it can be antiparallel. Therefore, the normalization constant is the sum of these possibilites, then
+where $\Sigma_x$ is the sum of the nearest neighbors of the spin in site $x$. This is a discrete distibution in $s'_x$ since there are only two posibilities for the spin: the proposal spin can be parallel to the original spin or it can be antiparallel. Therefore, the normalization constant is the sum of these possibilites, then
 \begin{equation}
-	p = \frac{\exp(-\beta s_x\Sigma_x)}{\exp(-\beta s_x\Sigma_x) + \exp(+\beta s_x\Sigma_x)}.
+	p = \frac{\exp(-\beta s'_x\Sigma_x)}{\exp(-\beta s'_x\Sigma_x) + \exp(+\beta s'_x\Sigma_x)}.
 \end{equation} 
 This can be rearrange to
 \begin{equation}
-	p = \frac{1}{1 + \exp(-2\beta s_x\Sigma_x)} = \frac{1}{1 + \exp(\Delta E)},
+	p = \frac{1}{1 + \exp(-2\beta s'_x\Sigma_x)},
 \end{equation}
-which is the same as the Glauber probability.
+which is the same form as the Glauber probability \cite{Glauber}. However there is a subtlety, in the Glauber dynamics we consider a spin $s_x$ and a proposal $s'_x$, since there are only two possibilities of the spin $s'_x = -s_x$. We accept the flip with probability
+\begin{equation}
+    p = \frac{1}{1 + \exp(\Delta E)},
+\end{equation}
+where $\Delta E = -2\beta s_x\Sigma_x$. So there exists a possibility of rejecting the flip.
+
+On the other hand, the Heatbath algorithm always accepts the proposal. However, the probability of accepting a spin up ($s'_x = +1$) is
+\begin{equation}
+    p_+= \frac{1}{1 + \exp(-2\beta\Sigma_x)},
+\end{equation}
+if we generate a uniform random number $r\in[0,1)$ and if $r\le p_+$, the we accept the propososal $s'_x = 1$. But if $r > p_+$ we accept $s'_x = -1$ instead. 
+
+\newpage
+\section*{Heatbath algorithm for SU(2)}
+In the heatbath algorithm we need to generate an update $X\in\text{SU}(2)$
+	 \begin{equation}
+	 	X = \begin{pmatrix}
+	 		 x_0 + ix_1 & x_2 + ix_3 \\
+	 		-x_2 + ix_3 & x_0 - ix_3
+	 	\end{pmatrix}
+	 \end{equation}
+	 where $x_0, x_1, x_2,x_3 \in \mathbb{R}$
+ following the distribution
+\begin{equation}
+	dP(X) = \frac{1}{2\pi^2} d\cos\theta\, d\varphi\, dx_0\, \sqrt{1-x_0^2}e^{\alpha\beta x_0}
+\end{equation}
+\begin{enumerate}
+\item Given some field configuration at a point $x$ and direction $\mu$, we compute the sum of staples $\Sigma_{x,\mu}$ in eq.\ \eqref{eq:staples}, $\alpha = \sqrt{\det \Sigma_{x,\mu}}$, and define $V = \Sigma_{x,\mu}/\alpha$
+	\item We generate $X$ as follows:
+	\begin{enumerate}
+	\item	We generate three random numbers $u_i$, $i = 1,\ 2,\ 3$ in the interval [0,1) uniformly distributed and take $r_i = 1 - u_i$. Then
+		 \begin{equation}
+		 	\lambda^2 = -\frac{1}{2\alpha\beta}\left(\log(r_1) + \cos^2(2\pi r_2)\log(r_3)\right).
+		 \end{equation}
+	\item We accept the value of $\lambda$ which obey
+		\begin{equation}
+			s^2 \leq 1- \lambda^2,
+		\end{equation}
+		where $s$ is a uniformly distributed random number in the interval [0,1).
+	\item Repeat the previous two steps until a value of $\lambda$ is accepted. The accepted value gives $x_0 = 1 - 2\lambda^2$.
+	\item We take the norm of the vector $\vec{x} = (x_1,x_2,x_3)$ as $|\vec{x}| = \sqrt{1 - x_0^2}$.
+	\item We take two uniformly distributed random numbers $t \in [0,1)$ and $\varphi\in [0,2\pi)$ 
+	\begin{eqnarray}
+		x_1 & = & 1 - 2 t \\
+		x_2 & = & \sqrt{1 - x_1^2} \cos\varphi \\
+		x_3 & = & \sqrt{1 - x_1^2} \sin\varphi	
+	\end{eqnarray}		
+	  
+	\end{enumerate}
+	\item Once $X$ is generated, the new link variable is $U = X V$.
+\end{enumerate}
+
+\newpage
+\section*{Heatbath algorithm for SU(3)}
+The heatbath algorithm was first implemented by Creutz for the SU(2) theory \cite{creutz1980} and generalized to SU($N$) theories by Cabbibo and Marinari \cite{cabbibo1982}. The idea for implementing the algorithm in SU($N$) is to iterate over a set of SU(2) subgroups in SU($N$) and apply the heatbath algorithm to these SU(2) elements. 
+
+\begin{enumerate}
+	\item Given some field configuration at a point $x$ and direction $\mu$, we find the sum of staples $\Sigma_{x,\mu}$ in eq.\ \eqref{eq:staples}.
+	
+	\item We compute $W = U_{x,\mu} \Sigma_{x,\mu}^{\dagger}$ and define $W_2$ as the $2\times 2$ submatrix of $W$ that has the same block structure as $R$ (or $S$ or $T$).
+	
+	\item $W_2$ is a complex $2\times 2$ matrix which is generally not an element of SU(2). As described in Ref.\ \cite{kennedy1985}, we generate a matrix proportional to an SU(2) element from $W_2$ as follows
+	\begin{equation}
+	V = \frac{1}{2} \left[ W_2 - W_2^{\dagger} + \mathds{1}\text{Tr}\ W_2^{\dagger}\right]
+	\end{equation}
+	\item We compute the determinant of $V$ and take $\xi = \sqrt{\det V}$
+	
+	\item We follow the original heatbath implementation of Creutz. We generate a uniform random number $r \in [\exp(-\frac{4}{3}\beta \xi),1]$ and compute
+	\begin{equation}
+		x_0 = 1 + \frac{\log r}{\frac{2}{3}\beta \xi}.
+	\end{equation}		
+	
+	Now we generate a uniform random number $u\in [0,1)$ and accept $x_0$ if $ u > 1 - \sqrt{1-x_0^2}$. Repeat this step until a $x_0$ is accepted.
+	
+	\item We now generate a vector $\vec{x} = (x_1,x_2,x_3)$ in the unit 2-sphere uniformly distributed. This may be acomplished as follows. We generate three random numbers $\vec{r} = (r_1,r_2,r_3)$ in the interval $[-1,1]$ and accept them if they are inside the unit 3-sphere. Otherwise we generate other three numbers until they are accepted. Once they are accepted we take
+	\begin{equation}
+		\vec{x} = \sqrt{1 - x_0^2} \frac{\vec{r}}{|\vec{r}\,|}.
+	\end{equation}
+	\item We have generated the elements of a SU(2) matrix $X$
+	\begin{equation}
+		X = \begin{pmatrix}
+			x_0 + ix_1 & x_2 + ix_3 \\
+		   -x_2 + ix_3 & x_0 - ix_1
+		\end{pmatrix}
+	\end{equation}
+	\item We take
+		\begin{equation}
+			R_2 = X \frac{V^{\dagger}}{\xi}.
+		\end{equation}
+		And transform this $2\times 2$ matrix to the same block structure as the $3\times 3$ matrix $R$ (or $S$ or $T$).
+		\item We go to step 2 and repeat the process to generate $S$ (or $T$) but this time taking $W = R U_{x,\mu}\Sigma_{x,\mu}$ (or $W = S R U_{x,\mu}\Sigma_{x,\mu}$).
+	\item The new link element $U'_{x,\mu}$ is
+	\begin{equation}
+		U'_{x,\mu} = T S R U_{x,\mu}.
+	\end{equation}			
+\end{enumerate}
+
+\begin{thebibliography}{99}
+
+  \bibitem{creutz1980} M. Creutz, \emph{Monte Carlo Study of the Quantized SU(2) Gauge Theory.} Phys.\ Rev.\ D {\bf 21} (1980) 2308-2315.
+
+\bibitem{gattringer} C.\ Gattringer and C.B.\ Lang, \emph{Quantum Chromodynamics on the Lattice: An Introductory Presentation},  Lect.\ Notes Phys.\ 788 (Springer, Berlin Heidelberg 2010).
+
+\bibitem{knechtli} F.\ Knechtli, M.\ Günther and M.\ Peardon. \emph{Lattice Quantum Chromodynamics Practical Essentials}, SpringerBriefs in Physics 2017.
+
+\bibitem{Gerber} U.\ Gerber,
+  \emph{Heatbath Algorithm for the 2d U(1) Model}.
+  Informal Notes. Universidad Nacional Autónoma de México, 2015.  
+  
+
+%\bibitem{Metropolis} N.\ Metropolis {\it et al.},
+%\emph{Equation of State Calculations by Fast Computing Machines},
+%J.\ Chem.\ Phys.\ {\bf 21} (1953) 1087.
+
+\bibitem{Glauber} R.J.\ Glauber,
+  \emph{Time-Dependent Statistics of the Ising Model},
+  J.\ Math.\ Phys.\ {\bf 4} (1963) 294.
+  
+
+\bibitem{cabbibo1982} N. Cabbibo, E. Marinari, \emph{A New Method for Updating SU(N) Matrices in Computer Simulations of Gauge Theories}, Phys.\ Lett.\ B {\bf 119} (1982) 387-390.
+
+\bibitem{kennedy1985} A.D.\ Kennedy, B.J.\ Pendleton, \emph{Improved Heatbath Method for Monte Carlo Calculations in Lattice Gauge Theories}, Phys.\ Lett.\ {\bf 156B} (1985) 393-399.
+\end{thebibliography}
 \end{document}
